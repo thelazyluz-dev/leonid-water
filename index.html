@@ -72,7 +72,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#0a1020;font-family:"S
 .touch #touch [data-k="ArrowUp"]{right:16px!important;bottom:122px!important}.touch #touch [data-k="ArrowDown"]{right:16px!important;bottom:22px!important}
 .touch #touch [data-k="ArrowLeft"]{left:16px!important;bottom:22px!important}.touch #touch [data-k="ArrowRight"]{left:114px!important;bottom:22px!important}
 .touch #touch #tFix{left:16px!important;bottom:122px!important}.touch #touch #tSiren{left:114px!important;bottom:122px!important}
-.touch #touch #tFly{display:flex;left:16px!important;bottom:222px!important}.touch #touch #tFly[hidden]{display:none!important}
+.touch #touch #tFly{display:flex;left:16px!important;bottom:222px!important}.touch #touch #tFly[hidden]{display:none!important}.touch #touch #tSiren[hidden]{display:none!important}
 @media (orientation:landscape){.touch #touch div{width:70px!important;height:70px!important;font-size:30px!important}
  .touch #touch [data-k="ArrowUp"]{bottom:100px!important}.touch #touch [data-k="ArrowRight"]{left:96px!important}.touch #touch #tFix{bottom:100px!important}.touch #touch #tSiren{left:96px!important;bottom:100px!important}.touch #touch #tFly{left:176px!important;bottom:18px!important}}
 .touch #menu .nk{display:none}.touch #menu p{font-size:16px}.touch #menu h1{font-size:min(10vw,48px)}
@@ -981,7 +981,7 @@ function renderShop(head) {
   shopEl.querySelector('.go').onclick = () => location.reload();
 }
 addEventListener('keydown', e => { if (shopEl.classList.contains('show') && (e.code === 'Enter' || e.code === 'Space')) location.reload(); });
-{ const tb = document.querySelector('#touch [data-k="ControlRight"]'); if (tb) { tb.textContent = '🚨'; tb.removeAttribute('data-k'); tb.id = 'tSiren'; tb.addEventListener('touchstart', e => { e.preventDefault(); if (players[0]) honk(players[0]); }, { passive: false }); } }
+{ const tb = document.querySelector('#touch [data-k="ControlRight"]'); if (tb) { tb.textContent = '🚨'; tb.removeAttribute('data-k'); tb.id = 'tSiren'; tb.hidden = !(UP('siren') || UP('bottles')); tb.addEventListener('touchstart', e => { e.preventDefault(); if (players[0]) honk(players[0]); }, { passive: false }); } }
 addEventListener('touchstart', e => { const c = players[0]; if (!c || !c.fix || state !== 'play') return; if (e.target.closest && e.target.closest('#touch div, #wshop, #pauseBtn, #pauseEl')) return; e.preventDefault(); fixHit(c); }, { passive: false });
 addEventListener('mousedown', e => { const c = players[0]; if (c && c.fix && state === 'play' && !TOUCH) fixHit(c); });
 { const tp = document.getElementById('touch'); if (tp) { const fb = document.createElement('div'); fb.id = 'tFly'; fb.textContent = '✈️'; fb.hidden = !UP('wings'); tp.appendChild(fb); fb.addEventListener('touchstart', e => { e.preventDefault(); if (players[0]) wFly(players[0]); }, { passive: false }); }
