@@ -81,7 +81,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#0a1020;font-family:"S
 .touch .hud .top{top:10px;right:10px;left:10px;justify-content:space-between;font-size:16px;padding:6px 12px}.touch .hud .tot{font-size:13px}
 .touch .hud .street{top:auto;bottom:calc(320px + env(safe-area-inset-bottom,0px));font-size:15px;padding:4px 14px}
 .touch .fixbar{bottom:auto;top:34%;width:92%;padding:8px 10px}.touch .fb-track{height:44px}.touch .fb-t{font-size:16px}
-.touch #boss{top:calc(186px + env(safe-area-inset-top,0px));padding:4px 12px 4px 6px}.touch #boss img{height:46px}.touch #boss span{font-size:15px}.touch #boss b{font-size:12px}
+.touch .hud .street{display:none!important}.touch #boss{top:calc(134px + env(safe-area-inset-top,0px));left:auto;right:calc(10px + env(safe-area-inset-right,0px));transform:translateY(-20px);max-width:56%;padding:4px 12px 4px 6px}.touch #boss.show{transform:none}.touch #boss img{height:36px}.touch #boss span{font-size:13px}.touch #boss b{font-size:12px}
 .touch .hud .toast{font-size:15px;white-space:normal;text-align:center;width:max-content;max-width:88%}
 .touch #wshop .box{padding:12px}.touch #wshop .items{grid-template-columns:1fr 1fr}.touch #wshop .items button{font-size:14px;padding:6px}
 @media (orientation:landscape){.touch .fixbar{top:44%;width:44%}.touch #boss{top:calc(60px + env(safe-area-inset-top,0px));max-width:46%}.touch .fixbar{top:46%}.touch .hud .street{display:none}.touch .hud .toast{top:24%}.touch #menu .leo{height:22vh}.touch #menu p{font-size:13px}}
@@ -805,7 +805,7 @@ function spawnBurst(type, at) {
   const nr = nearRoad(x, z), street = nr.s && nr.s.name ? nr.s.name.replace(/^רחוב /, '') : '';
   const b = { type, B, x, z, y, col, beam, pud, lb, t: 0, crowd: [], fixer: null, prio, street, news: false, auto: 0 };
   bursts.push(b); addCitizen(b);
-  boss(type === 'main' ? `🚨 פיצוץ ראשי${prio ? ' ליד ' + prio[0] : ''}${street ? ' ברחוב ' + street : ''}! תזוז לאוניד!` : pick([`יש ${B.n}${street ? ' ברחוב ' + street : ''}, סע לשם`, `תושבים מתקשרים על ${B.n}${street ? ' ב' + street : ''}`, `${B.n} חדשה, אל תתמהמה!`]));
+  if (type === 'main') boss( `🚨 פיצוץ ראשי${prio ? ' ליד ' + prio[0] : ''}! תזוז!`);
   tone(660, .2, 'square', .1); tone(520, .25, 'square', .1, .22);
 }
 function addCitizen(b) {
@@ -819,7 +819,7 @@ function cheerAndLeave(b) { const cr = b.crowd; b.crowd = []; let k = 0; const i
 
 /* ---------- the boss on the radio ---------- */
 const bossBox = document.createElement('div'); bossBox.id = 'boss'; bossBox.innerHTML = `<img alt="" src="${WI.boss ? WI.boss[0] : ''}"><div><b>📻 הבוס בקשר</b><span></span></div>`; document.body.appendChild(bossBox);
-let bossT = 0; function boss(txt) { bossBox.querySelector('span').textContent = txt; bossBox.classList.add('show'); clearTimeout(bossT); bossT = setTimeout(() => bossBox.classList.remove('show'), 4200); }
+let bossT = 0; function boss(txt) { bossBox.querySelector('span').textContent = txt; bossBox.classList.add('show'); clearTimeout(bossT); bossT = setTimeout(() => bossBox.classList.remove('show'), 2800); }
 
 /* ---------- the fix: a cursor runs on the bar, press when it is in the green ---------- */
 function fixUI(c) {
@@ -858,10 +858,9 @@ function finishFix(c) {
   const pay = Math.max(Math.round(b.B.pay * .5), b.B.pay + speed + perf - crowdPen + (b.prio ? 120 : 0));
   WS.money += pay; SH.earned += pay; SH.fixed++; SH.perfect += F.perf; if (b.crowd.length <= 2 && SH.rep < 5 && Math.random() < .5) SH.rep++;
   const lb = label('+₪' + pay, 3, { bg: 'rgba(40,170,80,.95)', border: '#fff' }); lb.position.set(b.x, b.y + 8, b.z); scene.add(lb); let k = 0; const iv = setInterval(() => { lb.position.y += .25; if (++k > 50) { clearInterval(iv); scene.remove(lb); } }, 30);
-  toast(c, `✅ תוקן! ₪${pay}` + (speed > 30 ? ' · בונוס מהירות' : '') + (F.perf ? ` · ${F.perf} מושלמים` : '') + (crowdPen ? ` · −${crowdPen} על התור` : ''), 3200);
+  toast(c, `✅ תוקן! ₪${pay}` + (speed > 30 ? ' · בונוס מהירות' : '') + (F.perf ? ` · ${F.perf} מושלמים` : '') + (crowdPen ? ` · −${crowdPen} על התור` : ''), 2200);
   [523, 659, 784, 1047].forEach((f, i) => tone(f, .3, 'triangle', .16, i * .1)); burst(b.x, b.y + 6, b.z, 140, 14, pick(['#ffd040', '#6ad1ff', '#9dff7a']), 1.8);
   wSet(c.leo, 'leo_jump'); c.leoT = 1.4; cheerAndLeave(b); removeBurst(b); hudW();
-  if (Math.random() < .5) boss(pick(['כל הכבוד לאוניד! 👏', 'יופי, התושבים מרוצים', 'מהר כמו ברק! יש עוד עבודה', 'ככה עובדים במחלקת המים!']));
 }
 
 /* ---------- action key replaces flying; the horn becomes a siren / water bottles ---------- */
