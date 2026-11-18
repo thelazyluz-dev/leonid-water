@@ -905,9 +905,7 @@ stepCar = function (c, dt, t) {
   const H = c.hud; let best = null, bd = 1e9; for (const b of bursts) { const d = Math.hypot(b.x - c.x, b.z - c.z) * (b.type === 'main' ? .6 : 1); if (d < bd) { bd = d; best = b; } }
   H.ar.parentNode.style.display = best ? '' : 'none'; c.target = best;
   if (!H.arSvg) { H.arSvg = true; H.ar.innerHTML = ARROW_SVG; }
-  if (best) { const a = Math.atan2(best.x - c.x, -(best.z - c.z)); H.ar.style.transform = `rotate(${a - c.h}rad)`; H.dist.textContent = (best.type === 'main' ? '🚨 ' : '💦 ') + Math.round(Math.hypot(best.x - c.x, best.z - c.z)) + ' מ׳';
-    const A = arrow3d(c), d = Math.hypot(best.x - c.x, best.z - c.z); A.visible = !c.fix && d > 18; A.position.set(c.x, c.y + 4 + Math.sin(t * 4) * .2, c.z); A.rotation.y = -a; A.children[0].material.color.setHex(best.type === 'main' ? 0xff3a2a : 0xffd000); }
-  else if (c.arrow3) c.arrow3.visible = false;
+  if (best) { const a = Math.atan2(best.x - c.x, -(best.z - c.z)); H.ar.style.transform = `rotate(${a - c.h}rad)`; H.dist.textContent = (best.type === 'main' ? '🚨 ' : '💦 ') + Math.round(Math.hypot(best.x - c.x, best.z - c.z)) + ' מ׳'; }
 };
 const ARROW_SVG = '<svg viewBox="0 0 40 52" width="40" height="52" aria-hidden="true"><path d="M20 2 L38 24 L27 24 L27 50 L13 50 L13 24 L2 24 Z" fill="#ffd000" stroke="#1c2f55" stroke-width="3" stroke-linejoin="round"/></svg>';
 function arrow3d(c) {   // a big arrow floating over the van, pointing at the next burst
