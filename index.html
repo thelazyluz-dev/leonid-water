@@ -903,14 +903,29 @@ stepCar = function (c, dt, t) {
     c.leo.position.set(lx, HT(lx, lz) + hh / 2 + jy, lz);
   }
   const H = c.hud; let best = null, bd = 1e9; for (const b of bursts) { const d = Math.hypot(b.x - c.x, b.z - c.z) * (b.type === 'main' ? .6 : 1); if (d < bd) { bd = d; best = b; } }
-  H.ar.parentNode.style.display = best ? '' : 'none';
-  if (best) { H.ar.style.transform = `rotate(${Math.atan2(best.x - c.x, -(best.z - c.z)) - c.h}rad)`; H.dist.textContent = (best.type === 'main' ? '🚨 ' : '💦 ') + Math.round(Math.hypot(best.x - c.x, best.z - c.z)) + ' מ׳'; }
+  H.ar.parentNode.style.display = best ? '' : 'none'; c.target = best;
+  if (!H.arSvg) { H.arSvg = true; H.ar.innerHTML = ARROW_SVG; }
+  if (best) { const a = Math.atan2(best.x - c.x, -(best.z - c.z)); H.ar.style.transform = `rotate(${a - c.h}rad)`; H.dist.textContent = (best.type === 'main' ? '🚨 ' : '💦 ') + Math.round(Math.hypot(best.x - c.x, best.z - c.z)) + ' מ׳';
+    const A = arrow3d(c), d = Math.hypot(best.x - c.x, best.z - c.z); A.visible = !c.fix && d > 18; A.position.set(c.x, c.y + 4 + Math.sin(t * 4) * .2, c.z); A.rotation.y = -a; A.children[0].material.color.setHex(best.type === 'main' ? 0xff3a2a : 0xffd000); }
+  else if (c.arrow3) c.arrow3.visible = false;
 };
+const ARROW_SVG = '<svg viewBox="0 0 40 52" width="40" height="52" aria-hidden="true"><path d="M20 2 L38 24 L27 24 L27 50 L13 50 L13 24 L2 24 Z" fill="#ffd000" stroke="#1c2f55" stroke-width="3" stroke-linejoin="round"/></svg>';
+function arrow3d(c) {   // a big arrow floating over the van, pointing at the next burst
+  if (c.arrow3) return c.arrow3; const g = new THREE.Group(), m = new THREE.MeshBasicMaterial({ color: 0xffd000 }), edge = new THREE.MeshBasicMaterial({ color: 0x1c2f55 });
+  const head = new THREE.Mesh(new THREE.ConeGeometry(1.1, 1.7, 4), m); head.geometry.rotateX(-Math.PI / 2); head.rotation.z = Math.PI / 4; head.position.z = -1.5; g.add(head);
+  const shaft = new THREE.Mesh(new THREE.BoxGeometry(.7, .35, 1.9), m); shaft.position.z = .25; g.add(shaft);
+  g.children.forEach(o => { o.renderOrder = 5; }); scene.add(g); return (c.arrow3 = g);
+}
 const _drawMini = drawMini;
 drawMini = function (c) {
   _drawMini(c); const g = c.hud.mini, span = 620, k = 170 / (span * MS);
-  for (const b of bursts) { let x = 85 + (b.x - c.x) * MS * k, y = 85 + (b.z - c.z) * MS * k; const dx = x - 85, dy = y - 85, r = Math.hypot(dx, dy); if (r > 76) { x = 85 + dx / r * 76; y = 85 + dy / r * 76; }
-    g.fillStyle = b.type === 'main' ? '#ff4a2a' : '#2a9cff'; g.strokeStyle = '#fff'; g.lineWidth = 2; g.beginPath(); g.arc(x, y, r > 76 ? 4 : 6, 0, 7); g.fill(); g.stroke(); }
+  const pulse = (performance.now() / 600) % 1;
+  for (const b of bursts) { let x = 85 + (b.x - c.x) * MS * k, y = 85 + (b.z - c.z) * MS * k; const dx = x - 85, dy = y - 85, r = Math.hypot(dx, dy), out = r > 72; if (out) { x = 85 + dx / r * 72; y = 85 + dy / r * 72; }
+    const col = b.type === 'main' ? '#ff3a2a' : '#1e8cff', tgt = b === c.target;
+    if (tgt) { g.save(); g.setLineDash([5, 4]); g.strokeStyle = col; g.lineWidth = 3; g.beginPath(); g.moveTo(85, 85); g.lineTo(x, y); g.stroke(); g.restore();
+      g.strokeStyle = col; g.globalAlpha = 1 - pulse; g.lineWidth = 3; g.beginPath(); g.arc(x, y, 9 + pulse * 10, 0, 7); g.stroke(); g.globalAlpha = 1; }
+    g.fillStyle = col; g.strokeStyle = '#fff'; g.lineWidth = 2.5; g.beginPath(); g.arc(x, y, tgt ? 10 : 7, 0, 7); g.fill(); g.stroke();
+    g.font = (tgt ? 13 : 9) + 'px sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('💦', x, y + 1); }
 };
 
 /* ---------- HUD: money, shift clock, reputation ---------- */
