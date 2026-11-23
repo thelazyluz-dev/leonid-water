@@ -2870,6 +2870,8 @@ const R10 = (function () {
 const st = document.createElement('style'); st.textContent = `
 #touch,#touch *,#tHorn,.rp,.fixbar{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 html,body{overscroll-behavior:none}
+.touch #touch #tFly{left:auto!important;right:calc(125px + env(safe-area-inset-right,0px))!important;bottom:calc(204px + env(safe-area-inset-bottom,0px))!important;width:66px!important;height:66px!important;font-size:32px!important}   /* fix: the plane button sat on top of the joystick */
+@media (max-width:360px){.touch #touch #tFly{right:calc(103px + env(safe-area-inset-right,0px))!important;bottom:calc(170px + env(safe-area-inset-bottom,0px))!important;width:56px!important;height:56px!important}}
 .touch #touch #tGas.on,.touch #touch #tBrake.on,.touch #touch #tFix:active,#wshop button:active,#menu button:active,.endR .er-b button:active{transform:scale(.93);filter:brightness(1.15);transition:transform .1s}   /* round 11: visible press feedback */
 .touch .rp .pct{font-size:17px!important}.touch .fixbar .fb-k{font-size:16px!important;opacity:1!important}.touch .rp h4{font-size:max(18px,1em)}
 .touch .hud .toast{font-size:max(16px,1em)}
